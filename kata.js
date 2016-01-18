@@ -473,29 +473,7 @@
     body = randBody();
     return {
       question: fun(checkConstraints(body)),
-      answer: normalise(fun(guardConstraints(JSON.parse(JSON.stringify(body))))),
-      testMe: function() {
-        console.log("Convert this to early-exit form:");
-        return console.log(generate(this.question, {
-          format: {
-            indent: {
-              style: '  '
-            }
-          }
-        }));
-      },
-      checkMe: function(answer) {
-        var d;
-        answer = normalise(parse(answer));
-        d = diff(this.answer, answer);
-        if (d) {
-          console.log("In", d[2].join('\n  > '));
-          console.log("Expected", d[0].type && maybeGenerate(d[0]) || d[0]);
-          return console.log("Got", d[1].type && maybeGenerate(d[1]) || d[1]);
-        } else {
-          return console.log("Right!");
-        }
-      }
+      answer: normalise(fun(guardConstraints(JSON.parse(JSON.stringify(body)))))
     };
   };
 
@@ -549,7 +527,8 @@
     diff: diff,
     gen: gen,
     generate: generate,
-    parse: parse
+    parse: parse,
+    maybeGenerate: maybeGenerate
   };
 
   if (typeof module === 'undefined' && typeof 'window' !== 'undefined') {

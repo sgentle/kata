@@ -14,7 +14,7 @@ difference in how quickly they reach the higher-level skills. After all, you
 can't really be thinking high-level if you're spending a lot of energy on
 simple things.
 
-This prototype only handles one particular transform: refacoring a function
+This prototype only handles one particular transform: refactoring a function
 with nested conditions into using early-exit guard conditions at the
 top of the function.
 
@@ -380,18 +380,6 @@ We can now generate question/answer pairs for testing.
       body = randBody()
       question: fun checkConstraints body
       answer: normalise fun guardConstraints JSON.parse(JSON.stringify(body))
-      testMe: ->
-        console.log "Convert this to early-exit form:"
-        console.log generate @question, format: indent: style: '  '
-      checkMe: (answer) ->
-        answer = normalise parse answer
-        d = diff @answer, answer
-        if d
-          console.log "In", d[2].join('\n  > ')
-          console.log "Expected", d[0].type and maybeGenerate(d[0]) or d[0]
-          console.log "Got", d[1].type and maybeGenerate(d[1]) or d[1]
-        else
-          console.log "Right!"
 
     maybeGenerate = (x) ->
       try
@@ -420,12 +408,9 @@ We can now generate question/answer pairs for testing.
 Export
 ------
 
-    ex = {normalise, diff, gen, generate, parse}
+    ex = {normalise, diff, gen, generate, parse, maybeGenerate}
 
     if typeof module is 'undefined' and typeof 'window' isnt 'undefined'
       window.kata = ex
     else
       module.exports = ex
-
-
-    # console.log meta "#{generate { type: 'Identifier', name: 'x' }} % 0 == 1"

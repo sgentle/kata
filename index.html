@@ -105,15 +105,6 @@
       };
       $('#test').addEventListener('click', startTest);
 
-      function maybeGenerate(ast) {
-        try {
-          return kata.generate(ast);
-        }
-        catch (e) {
-          return null;
-        }
-      };
-
       var wins = 0
       function checkTest() {
         if (!currentTest) return;
@@ -123,8 +114,8 @@
         if (d) {
           var text = [];
           text.push("In " + d[2].join(' > '));
-          text.push("Expected " + (maybeGenerate(d[0]) || d[0]));
-          text.push("Got " + (maybeGenerate(d[1]) || d[1]));
+          text.push("Expected " + (kata.maybeGenerate(d[0]) || d[0]));
+          text.push("Got " + (kata.maybeGenerate(d[1]) || d[1]));
           $('#status').textContent = text.join('\n');
           wrapper.style.backgroundColor = "rgba(255, 100, 100, 0.05)"
         }
