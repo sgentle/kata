@@ -1,0 +1,147 @@
+<!doctype html>
+<head>
+  <title>Kata</title>
+  <link rel="stylesheet" href="lib/codemirror.css">
+  <style>
+    body {
+      font-family: "Helvetica Neue"
+    }
+    #content {
+      width: 60rem;
+      max-width: 100%;
+      margin: 2rem auto;
+    }
+    .CodeMirror {
+      border: 1px inset;
+      min-width: 20rem;
+      width: 100%;
+      height: 20rem;
+      display: inline-block;
+    }
+    #boxen {
+      display: flex;
+      flex-wrap: wrap-reverse;
+    }
+    .boxy {
+      flex: 1 0 30rem;
+      display: inline-block;
+      margin-top: 1em;
+    }
+    h1 {
+      margin: 2em 0;
+    }
+    #wins {
+      width: 2em;
+      height: 1em;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div id="content">
+    <h1>Kata</h1>
+    <h2>Early exit</h2>
+    <div>
+      <p>Early exit, also called early return, is a useful technique for reducing nesting and making your code more linear. If the main part of your function is wrapped in many different conditions, it can get buried in the middle of all that logic, making the whole function harder to read and understand.
+      <p>The solution is to reverse your thinking: you're not using conditions to say when your code should run, you're using them to say when it shouldn't. Those kind of conditions are called guards, and the nice thing about them is that you just read them in order. If you pass all the guards, congratulations! You're now allowed to run through the rest of the function in peace.
+      <p>Be warned, though, early exits can be used for evil as well as good. Scattering them around at different points throughout a large function is a recipe for confusing and unexpected bugss.
+    </div>
+
+    <div id="boxen">
+    <div class="boxy">
+      <h3>Early exit</h3>
+      <textarea id="answer" rows="25" cols="40"></textarea>
+    </div>
+
+    <div class="boxy">
+      <h3>Nested conditions</h3>
+      <textarea id="question" rows="25" cols="40"></textarea>
+    </div>
+    </div>
+
+    <br />
+
+    <button id="example">Example</button>
+    <button id="test">Test</button>
+    <button id="check">Check</button>
+    <pre id="status">
+    </pre>
+    <div id="wins">
+    </div>
+  </div>
+
+  <script src="lib/codemirror.min.js"></script>
+  <script src="lib/escodegen.min.js"></script>
+  <script src="lib/esprima.min.js"></script>
+  <script src="kata.js"></script>
+  <script>
+    (function() {
+      var $ = document.querySelector.bind(document);
+      var qmirror = CodeMirror.fromTextArea($('#question'), {lineNumbers: true, readOnly: true});
+      var amirror = CodeMirror.fromTextArea($('#answer'), {lineNumbers: true});
+      var wrapper = amirror.getWrapperElement()
+
+      var genopts = {format: {indent: {style: '  '}}}
+
+      function genExample() {
+        var g = kata.gen();
+        qmirror.setValue(kata.generate(g.question, genopts));
+        amirror.setValue(kata.generate(g.answer, genopts));
+        wrapper.style.backgroundColor = "rgba(0, 0, 0, 0)";
+        $('#status').textContent = "";
+      };
+      $('#example').addEventListener('click', genExample);
+
+      genExample();
+
+      var currentTest = null;
+      function startTest() {
+        var g = kata.gen();
+        currentTest = g;
+        var code = kata.generate(g.question, genopts);
+        qmirror.setValue(code);
+        amirror.setValue(code);
+        wrapper.style.backgroundColor = "rgba(0, 0, 0, 0)"
+      };
+      $('#test').addEventListener('click', startTest);
+
+      function maybeGenerate(ast) {
+        try {
+          return kata.generate(ast);
+        }
+        catch (e) {
+          return null;
+        }
+      };
+
+      var wins = 0
+      function checkTest() {
+        if (!currentTest) return;
+
+        var answer = kata.normalise(kata.parse(amirror.getValue()));
+        var d = kata.diff(currentTest.answer, answer);
+        if (d) {
+          var text = [];
+          text.push("In " + d[2].join(' > '));
+          text.push("Expected " + (maybeGenerate(d[0]) || d[0]));
+          text.push("Got " + (maybeGenerate(d[1]) || d[1]));
+          $('#status').textContent = text.join('\n');
+          wrapper.style.backgroundColor = "rgba(255, 100, 100, 0.05)"
+        }
+        else {
+          $('#status').textContent = "Right!";
+          wins++;
+          $('#wins').textContent = wins;
+          wrapper.style.backgroundColor = "rgba(127, 255, 127, 0.1)"
+          currentTest = null;
+        }
+
+      };
+
+      $('#check').addEventListener('click', checkTest);
+
+
+    })();
+  </script>
+
+</body>
